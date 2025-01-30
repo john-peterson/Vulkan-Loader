@@ -849,18 +849,22 @@ LOADER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkCreateXcbSurfaceKHR(VkInstance in
                                                                    const VkXcbSurfaceCreateInfoKHR *pCreateInfo,
                                                                    const VkAllocationCallbacks *pAllocator,
                                                                    VkSurfaceKHR *pSurface) {
+    printf("loader create xcb\n");
     struct loader_instance *loader_inst = loader_get_instance(instance);
     if (NULL == loader_inst) {
         loader_log(NULL, VULKAN_LOADER_FATAL_ERROR_BIT | VULKAN_LOADER_ERROR_BIT | VULKAN_LOADER_VALIDATION_BIT, 0,
                    "vkCreateXcbSurfaceKHR: Invalid instance [VUID-vkCreateXcbSurfaceKHR-instance-parameter]");
         abort(); /* Intentionally fail so user can correct issue. */
     }
+    printf("loader layer xcb create\n");
+    /* sleep(10); */
     return loader_inst->disp->layer_inst_disp.CreateXcbSurfaceKHR(loader_inst->instance, pCreateInfo, pAllocator, pSurface);
 }
 
 // This is the instance chain terminator function for CreateXcbSurfaceKHR
 VKAPI_ATTR VkResult VKAPI_CALL terminator_CreateXcbSurfaceKHR(VkInstance instance, const VkXcbSurfaceCreateInfoKHR *pCreateInfo,
                                                               const VkAllocationCallbacks *pAllocator, VkSurfaceKHR *pSurface) {
+    printf("loader term xcb create\n");
     VkResult result = VK_SUCCESS;
     VkIcdSurface *icd_surface = NULL;
     loader_platform_thread_lock_mutex(&loader_lock);
@@ -898,6 +902,7 @@ VKAPI_ATTR VkResult VKAPI_CALL terminator_CreateXcbSurfaceKHR(VkInstance instanc
         }
     }
 
+    printf("loader term xcb create\n");
     *pSurface = (VkSurfaceKHR)(uintptr_t)icd_surface;
 
 out:
@@ -962,18 +967,22 @@ LOADER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkCreateXlibSurfaceKHR(VkInstance i
                                                                     const VkXlibSurfaceCreateInfoKHR *pCreateInfo,
                                                                     const VkAllocationCallbacks *pAllocator,
                                                                     VkSurfaceKHR *pSurface) {
+    printf("loader create xlib\n");
     struct loader_instance *loader_inst = loader_get_instance(instance);
     if (NULL == loader_inst) {
         loader_log(NULL, VULKAN_LOADER_FATAL_ERROR_BIT | VULKAN_LOADER_ERROR_BIT | VULKAN_LOADER_VALIDATION_BIT, 0,
                    "vkCreateXlibSurfaceKHR: Invalid instance [VUID-vkCreateXlibSurfaceKHR-instance-parameter]");
+    printf("abort\n");
         abort(); /* Intentionally fail so user can correct issue. */
     }
+    printf("loader layer xlib create\n");
     return loader_inst->disp->layer_inst_disp.CreateXlibSurfaceKHR(loader_inst->instance, pCreateInfo, pAllocator, pSurface);
 }
 
 // This is the instance chain terminator function for CreateXlibSurfaceKHR
 VKAPI_ATTR VkResult VKAPI_CALL terminator_CreateXlibSurfaceKHR(VkInstance instance, const VkXlibSurfaceCreateInfoKHR *pCreateInfo,
                                                                const VkAllocationCallbacks *pAllocator, VkSurfaceKHR *pSurface) {
+    printf("loader term xlib create\n");
     VkResult result = VK_SUCCESS;
     VkIcdSurface *icd_surface = NULL;
     loader_platform_thread_lock_mutex(&loader_lock);
@@ -984,8 +993,10 @@ VKAPI_ATTR VkResult VKAPI_CALL terminator_CreateXlibSurfaceKHR(VkInstance instan
         loader_log(loader_inst, VULKAN_LOADER_ERROR_BIT, 0,
                    "VK_KHR_xlib_surface extension not enabled. vkCreateXlibSurfaceKHR not executed!");
         result = VK_ERROR_EXTENSION_NOT_PRESENT;
+    printf("loader term xlib not enabled\n");
         goto out;
     }
+    printf("loader term xlib proceed\n");
 
     // Next, if so, proceed with the implementation of this function:
     result = allocate_icd_surface_struct(loader_inst, sizeof(icd_surface->xlib_surf.base), sizeof(icd_surface->xlib_surf),
@@ -1011,6 +1022,7 @@ VKAPI_ATTR VkResult VKAPI_CALL terminator_CreateXlibSurfaceKHR(VkInstance instan
         }
     }
 
+    printf("loader term xlib create surface\n");
     *pSurface = (VkSurfaceKHR)(uintptr_t)icd_surface;
 
 out:

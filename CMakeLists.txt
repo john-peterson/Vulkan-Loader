@@ -83,9 +83,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(LOADER_HELPER_FOLDER "Helper Targets")
 
 if(UNIX)
-    set(FALLBACK_CONFIG_DIRS "/etc/xdg" CACHE STRING
+    set(FALLBACK_CONFIG_DIRS "/data/data/com.termux/files/usr/etc/xdg" CACHE STRING
             "Search path to use when XDG_CONFIG_DIRS is unset or empty or the current process is SUID/SGID. Default is freedesktop compliant.")
-    set(FALLBACK_DATA_DIRS "/usr/local/share:/usr/share" CACHE STRING
+    set(FALLBACK_DATA_DIRS "/data/data/com.termux/files/usr/share" CACHE STRING
             "Search path to use when XDG_DATA_DIRS is unset or empty or the current process is SUID/SGID. Default is freedesktop compliant.")
     set(SYSCONFDIR "" CACHE STRING
             "System-wide search directory. If not set or empty, CMAKE_INSTALL_FULL_SYSCONFDIR and /etc are used.")
@@ -98,8 +98,6 @@ endif()
 add_library(platform_wsi INTERFACE)
 if(WIN32)
     target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_WIN32_KHR)
-elseif(ANDROID)
-    message(FATAL_ERROR "Android build not supported!")
 elseif(APPLE)
     target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_METAL_EXT)
     if (IOS)
@@ -116,6 +114,10 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|DragonFly|GNU")
     option(BUILD_WSI_DIRECTFB_SUPPORT "Build DirectFB WSI support" OFF)
 
     find_package(PkgConfig REQUIRED QUIET) # Use PkgConfig to find Linux system libraries
+
+    if(ANDROID)
+        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
+    endif()
 
     if(BUILD_WSI_XCB_SUPPORT)
         pkg_check_modules(XCB REQUIRED QUIET IMPORTED_TARGET xcb)
@@ -278,8 +280,8 @@ if(UNIX)
         target_compile_definitions(loader_common_options INTERFACE SYSCONFDIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
 
         # Make sure /etc is searched by the loader
-        if(NOT (CMAKE_INSTALL_FULL_SYSCONFDIR STREQUAL "/etc"))
-            target_compile_definitions(loader_common_options INTERFACE EXTRASYSCONFDIR="/etc")
+        if(NOT (CMAKE_INSTALL_FULL_SYSCONFDIR STREQUAL "/data/data/com.termux/files/usr/etc"))
+            target_compile_definitions(loader_common_options INTERFACE EXTRASYSCONFDIR="/data/data/com.termux/files/usr/etc")
         endif()
     endif()
 endif()
